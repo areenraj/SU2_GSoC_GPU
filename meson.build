@@ -198,8 +198,8 @@ endif
 
 if get_option('enable-nvblas')
   su2_cpp_args += '-DHAVE_NVBLAS'
-  cc = meson.get_compiler('c')
-  nvblas_dep = cc.find_library('nvblas', dirs : ['/usr/local/cuda/lib64'])
+  cpp = meson.get_compiler('cpp')
+  nvblas_dep = cpp.find_library('nvblas', dirs : ['/usr/local/cuda/lib64'])
   su2_deps += nvblas_dep
   source= join_paths(meson.project_source_root(), 'meson_scripts/nvblas_config_gen.sh')
   r1 = run_command('bash', source)
