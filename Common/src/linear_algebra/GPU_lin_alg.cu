@@ -37,22 +37,15 @@ __global__ void GPUMatrixVectorProductAdd(matrixType* matrix, vectorType* vec, v
 {
 
    int i = blockIdx.x * blockDim.x + threadIdx.x;
-   int j = threadIdx.y;
-   int k = threadIdx.z;
-
-   int prod_index = i * nVar;
 
    if(i<nPointDomain)
    {
-      prod[prod_index + j] = 0.0;
-   }
+      int prod_index = i * nVar;
+      int j = threadIdx.y;
+      int k = threadIdx.z;
 
-   __syncthreads();
+      vectorType res = 0.0;
 
-   vectorType res = 0.0;
-
-   if(i<nPointDomain)
-   {
       for(int index = d_row_ptr[i]; index<d_row_ptr[i+1]; index++)
       {
         int matrix_index = index * nVar * nEqn;
@@ -78,12 +71,12 @@ void CSysMatrix<ScalarType>::GPUMatrixVectorProduct(const CSysVector<ScalarType>
   unsigned long mat_size = nnz*nVar*nEqn;
   unsigned long vec_size = nPointDomain*nVar;
 
-  gpuErrChk(cudaMalloc((void**)(&d_vec), (sizeof(ScalarType)*vec_size)));
-  gpuErrChk(cudaMalloc((void**)(&d_prod), (sizeof(ScalarType)*vec_size)));
+  cudaMalloc((void**)(&d_vec), (sizeof(ScalarType)*vec_size));
+  cudaMalloc((void**)(&d_prod), (sizeof(ScalarType)*vec_size));
 
-  gpuErrChk(cudaMemcpy((void*)(d_matrix), (void*)&matrix[0], (sizeof(ScalarType)*mat_size), cudaMemcpyHostToDevice));
-  gpuErrChk(cudaMemcpy((void*)(d_vec), (void*)&vec[0], (sizeof(ScalarType)*vec_size), cudaMemcpyHostToDevice));
-  gpuErrChk(cudaMemcpy((void*)(d_prod), (void*)&prod[0], (sizeof(ScalarType)*vec_size), cudaMemcpyHostToDevice));
+  cudaMemcpy((void*)(d_matrix), (void*)&matrix[0], (sizeof(ScalarType)*mat_size), cudaMemcpyHostToDevice);
+  cudaMemcpy((void*)(d_vec), (void*)&vec[0], (sizeof(ScalarType)*vec_size), cudaMemcpyHostToDevice);
+  cudaMemset((void*)(d_prod), 0.0, (sizeof(ScalarType)*vec_size));
 
   double xDim = (double) 1024.0/(nVar*nEqn);
   dim3 blockDim(floor(xDim), nVar, nEqn);
@@ -91,12 +84,11 @@ void CSysMatrix<ScalarType>::GPUMatrixVectorProduct(const CSysVector<ScalarType>
   dim3 gridDim(ceil(gridx), 1, 1);
 
   GPUMatrixVectorProductAdd<<<gridDim, blockDim>>>(d_matrix, d_vec, d_prod, d_row_ptr, d_col_ind, nPointDomain, nVar, nEqn);
-  gpuErrChk( cudaPeekAtLastError() );
 
-  gpuErrChk(cudaMemcpy((void*)(&prod[0]), (void*)d_prod, (sizeof(ScalarType)*vec_size), cudaMemcpyDeviceToHost));
+  cudaMemcpy((void*)(&prod[0]), (void*)d_prod, (sizeof(ScalarType)*vec_size), cudaMemcpyDeviceToHost);
 
-  gpuErrChk(cudaFree(d_vec));
-  gpuErrChk(cudaFree(d_prod));
+  cudaFree(d_vec);
+  cudaFree(d_prod);
 
 }
 

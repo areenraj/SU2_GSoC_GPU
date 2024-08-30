@@ -33,6 +33,11 @@
 #include "CSysVector.hpp"
 #include "CSysMatrix.hpp"
 
+#include <fstream>
+#include <chrono>
+#include <time.h>
+#include <iostream>
+
 /*!
  * \class CMatrixVectorProduct
  * \ingroup SpLinSys
@@ -151,6 +156,23 @@ class CSysMatrixVectorProduct final : public CMatrixVectorProduct<ScalarType> {
    * \param[out] v - CSysVector that is the result of the product
    */
   inline void operator()(const CSysVector<ScalarType>& u, CSysVector<ScalarType>& v) const override {
-    exec->mat_vec_prod(u, v, geometry, config, matrix);
+
+    std::ofstream serial;
+
+   auto start = std::chrono::high_resolution_clock::now(); 
+
+   exec->mat_vec_prod(u, v, geometry, config, matrix);
+
+   auto stop = std::chrono::high_resolution_clock::now();
+   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+   double time = duration.count();
+
+   serial.open("MVP_Exec_Time.txt", std::ios::app);
+   serial << time << "\n";
+   serial.close();
+
+
+
   }
 };

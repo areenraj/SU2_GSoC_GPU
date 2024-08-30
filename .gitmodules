@@ -27,3 +27,6 @@
 [submodule "subprojects/MLPCpp"]
 	path = subprojects/MLPCpp
 	url = https://github.com/EvertBunschoten/MLPCpp.git
+[submodule "subprojects/Tracy"]
+	path = subprojects/Tracy
+	url = https://github.com/wolfpld/tracy.git
