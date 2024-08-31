@@ -71,12 +71,12 @@ void CSysMatrix<ScalarType>::GPUMatrixVectorProduct(const CSysVector<ScalarType>
   unsigned long mat_size = nnz*nVar*nEqn;
   unsigned long vec_size = nPointDomain*nVar;
 
-  cudaMalloc((void**)(&d_vec), (sizeof(ScalarType)*vec_size));
-  cudaMalloc((void**)(&d_prod), (sizeof(ScalarType)*vec_size));
+  gpuErrChk(cudaMalloc((void**)(&d_vec), (sizeof(ScalarType)*vec_size)));
+  gpuErrChk(cudaMalloc((void**)(&d_prod), (sizeof(ScalarType)*vec_size)));
 
-  cudaMemcpy((void*)(d_matrix), (void*)&matrix[0], (sizeof(ScalarType)*mat_size), cudaMemcpyHostToDevice);
-  cudaMemcpy((void*)(d_vec), (void*)&vec[0], (sizeof(ScalarType)*vec_size), cudaMemcpyHostToDevice);
-  cudaMemset((void*)(d_prod), 0.0, (sizeof(ScalarType)*vec_size));
+  gpuErrChk(cudaMemcpy((void*)(d_matrix), (void*)&matrix[0], (sizeof(ScalarType)*mat_size), cudaMemcpyHostToDevice));
+  gpuErrChk(cudaMemcpy((void*)(d_vec), (void*)&vec[0], (sizeof(ScalarType)*vec_size), cudaMemcpyHostToDevice));
+  gpuErrChk(cudaMemset((void*)(d_prod), 0.0, (sizeof(ScalarType)*vec_size)));
 
   double xDim = (double) 1024.0/(nVar*nEqn);
   dim3 blockDim(floor(xDim), nVar, nEqn);
@@ -84,11 +84,12 @@ void CSysMatrix<ScalarType>::GPUMatrixVectorProduct(const CSysVector<ScalarType>
   dim3 gridDim(ceil(gridx), 1, 1);
 
   GPUMatrixVectorProductAdd<<<gridDim, blockDim>>>(d_matrix, d_vec, d_prod, d_row_ptr, d_col_ind, nPointDomain, nVar, nEqn);
+  gpuErrChk( cudaPeekAtLastError() );
 
-  cudaMemcpy((void*)(&prod[0]), (void*)d_prod, (sizeof(ScalarType)*vec_size), cudaMemcpyDeviceToHost);
+  gpuErrChk(cudaMemcpy((void*)(&prod[0]), (void*)d_prod, (sizeof(ScalarType)*vec_size), cudaMemcpyDeviceToHost));
 
-  cudaFree(d_vec);
-  cudaFree(d_prod);
+  gpuErrChk(cudaFree(d_vec));
+  gpuErrChk(cudaFree(d_prod));
 
 }
 
