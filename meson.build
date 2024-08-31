@@ -207,7 +207,8 @@ endif
 
 #building tracy subproject for code profiling
 if get_option('tracy_enable')
-  tracy_dep = dependency('tracy', static : true)
+  tracy_proj = subproject('tracy')
+  tracy_dep = tracy_proj.get_variable('tracy_dep')
   su2_deps += tracy_dep
 endif
 
