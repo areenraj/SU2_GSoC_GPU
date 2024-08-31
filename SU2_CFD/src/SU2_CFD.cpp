@@ -32,6 +32,8 @@
 #include "libxsmm.h"
 #endif
 
+#include "../../../subprojects/tracy/public/tracy/Tracy.hpp"
+
 /* Include file, needed for the runtime NaN catching. You also have to include feenableexcept(...) below. */
 //#include <fenv.h>
 
@@ -145,7 +147,8 @@ int main(int argc, char *argv[]) {
   }
 
   /*--- Launch the main external loop of the solver. ---*/
-
+  
+  ZoneScoped;
   driver->StartSolver();
 
   /*--- Finalize solver, delete all the containers, close history file, exit SU2. ---*/

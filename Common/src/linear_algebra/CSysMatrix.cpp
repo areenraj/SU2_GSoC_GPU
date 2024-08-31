@@ -36,7 +36,8 @@
 #include "../../include/linear_algebra/GPU_lin_alg.cuh"
 
 #ifndef gpuErrChk
-#define gpuErrChk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+#define gpuErrChk(ans) \
+  { gpuAssert((ans), __FILE__, __LINE__); }
 #endif
 
 #endif
@@ -145,7 +146,8 @@ void CSysMatrix<ScalarType>::Initialize(unsigned long npoint, unsigned long npoi
   gpuErrChk(cudaMalloc((void**)(&d_col_ind), (sizeof(col_ind) * nnz)));
   gpuErrChk(cudaMalloc((void**)(&d_matrix), (sizeof(ScalarType) * nnz * nVar * nEqn)));
 
-  gpuErrChk(cudaMemcpy((void*)(d_row_ptr), (void*)row_ptr, (sizeof(row_ptr) * (nPointDomain + 1.0)), cudaMemcpyHostToDevice));
+  gpuErrChk(
+      cudaMemcpy((void*)(d_row_ptr), (void*)row_ptr, (sizeof(row_ptr) * (nPointDomain + 1.0)), cudaMemcpyHostToDevice));
   gpuErrChk(cudaMemcpy((void*)(d_col_ind), (void*)col_ind, (sizeof(col_ind)) * nnz, cudaMemcpyHostToDevice));
 
 #endif

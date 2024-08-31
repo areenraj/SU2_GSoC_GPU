@@ -28,6 +28,8 @@
 #include "../../include/integration/CIntegration.hpp"
 #include "../../../Common/include/parallelization/omp_structure.hpp"
 
+#include "../../../subprojects/tracy/public/tracy/Tracy.hpp"
+
 
 CIntegration::CIntegration() {
   rank = SU2_MPI::GetRank();
@@ -40,6 +42,8 @@ void CIntegration::Space_Integration(CGeometry *geometry,
                                      CConfig *config, unsigned short iMesh,
                                      unsigned short iRKStep,
                                      unsigned short RunTime_EqSystem) {
+
+  ZoneScoped;
   unsigned short iMarker, KindBC;
 
   unsigned short MainSolver = config->GetContainerPosition(RunTime_EqSystem);

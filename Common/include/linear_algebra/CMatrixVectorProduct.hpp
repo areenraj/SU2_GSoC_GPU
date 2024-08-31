@@ -33,6 +33,8 @@
 #include "CSysVector.hpp"
 #include "CSysMatrix.hpp"
 
+#include "../../../subprojects/tracy/public/tracy/Tracy.hpp"
+
 /*!
  * \class CMatrixVectorProduct
  * \ingroup SpLinSys
@@ -57,6 +59,7 @@
  * functions from its derived classes to map the suitable path of
  * execution - CPU or GPU.
  */
+
 template <class ScalarType>
 class CMatrixVectorProduct {
  public:
@@ -151,10 +154,6 @@ class CSysMatrixVectorProduct final : public CMatrixVectorProduct<ScalarType> {
    * \param[out] v - CSysVector that is the result of the product
    */
   inline void operator()(const CSysVector<ScalarType>& u, CSysVector<ScalarType>& v) const override {
-
-
-   exec->mat_vec_prod(u, v, geometry, config, matrix);
-
-
+    exec->mat_vec_prod(u, v, geometry, config, matrix);
   }
 };

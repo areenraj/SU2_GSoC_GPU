@@ -36,6 +36,8 @@
 
 #include <limits>
 
+#include "../../../subprojects/tracy/public/tracy/Tracy.hpp"
+
 /*!
  * \brief Epsilon used in CSysSolve depending on datatype to
  * decide if the linear system is already solved.
@@ -361,6 +363,8 @@ unsigned long CSysSolve<ScalarType>::FGMRES_LinSolver(const CSysVector<ScalarTyp
 
   /*---  Check the subspace size ---*/
 
+  ZoneScoped;
+
   if (m < 1) {
     SU2_MPI::Error("Number of linear solver iterations must be greater than 0.", CURRENT_FUNCTION);
   }
@@ -451,6 +455,8 @@ unsigned long CSysSolve<ScalarType>::FGMRES_LinSolver(const CSysVector<ScalarTyp
   for (i = 0; i < m; i++) {
     /*---  Check if solution has converged ---*/
 
+    ZoneScopedN("Inner Loop");
+
     if (beta < tol * norm0) break;
 
     if (flexible) {
@@ -462,6 +468,8 @@ unsigned long CSysSolve<ScalarType>::FGMRES_LinSolver(const CSysVector<ScalarTyp
 
       mat_vec(Z[i], W[i + 1]);
     } else {
+
+      ZoneScopedN("Mat Vec");
       mat_vec(W[i], W[i + 1]);
     }
 

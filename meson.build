@@ -207,9 +207,22 @@ endif
 
 #building tracy subproject for code profiling
 if get_option('tracy_enable')
-  tracy_proj = subproject('tracy')
-  tracy_dep = tracy_proj.get_variable('tracy_dep')
-  su2_deps += tracy_dep
+  cmake = import('cmake')
+  cmake_opts = cmake.subproject_options()
+  cmake_opts.set_override_option('warning_level', '0')
+  cmake_opts.add_cmake_defines({
+    'LEGACY' : 'ON',
+    'TRACY_ENABLE': 'ON',
+    'TRACY_ON_DEMAND': 'ON',
+    'CMAKE_MAKE_PROGRAM': join_paths(meson.project_source_root(), 'ninja'),
+    'CMAKE_POSITION_INDEPENDENT_CODE': 'ON'
+  })
+
+  tracy_subproj = cmake.subproject('tracy', options: cmake_opts)
+  tracy_dep = tracy_subproj.dependency('TracyClient')
+  su2_deps     += tracy_dep
+  su2_cpp_args += '-DHAVE_TRACY'
+
 endif
 
 # blas-type dependencies

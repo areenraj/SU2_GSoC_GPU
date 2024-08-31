@@ -28,6 +28,8 @@
 #include "../../include/iteration/CFluidIteration.hpp"
 #include "../../include/output/COutput.hpp"
 
+#include "../../../subprojects/tracy/public/tracy/Tracy.hpp"
+
 void CFluidIteration::Preprocess(COutput* output, CIntegration**** integration, CGeometry**** geometry,
                                  CSolver***** solver, CNumerics****** numerics, CConfig** config,
                                  CSurfaceMovement** surface_movement, CVolumetricMovement*** grid_movement,
@@ -74,6 +76,7 @@ void CFluidIteration::Iterate(COutput* output, CIntegration**** integration, CGe
   const auto main_solver = config[val_iZone]->GetKind_Solver();
   config[val_iZone]->SetGlobalParam(main_solver, RUNTIME_FLOW_SYS);
 
+  ZoneScoped;
   /*--- Solve the Euler, Navier-Stokes or Reynolds-averaged Navier-Stokes (RANS) equations (one iteration) ---*/
 
   integration[val_iZone][val_iInst][FLOW_SOL]->MultiGrid_Iteration(geometry, solver, numerics, config, RUNTIME_FLOW_SYS,
@@ -378,6 +381,8 @@ void CFluidIteration::Solve(COutput* output, CIntegration**** integration, CGeom
 
   unsigned long Inner_Iter, nInner_Iter = config[val_iZone]->GetnInner_Iter();
   bool StopCalc = false;
+
+  ZoneScoped;
 
   /*--- Synchronization point before a single solver iteration.
         Compute the wall clock time required. ---*/

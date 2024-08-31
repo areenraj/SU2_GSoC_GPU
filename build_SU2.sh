@@ -1,7 +1,5 @@
 #!bin/bash
 
-rm -r build
-
 export PKG_CONFIG_PATH="/home/areen/Programs/OpenBLAS_install/lib:$PKG_CONFIG_PATH"
 export PKG_CONFIG_PATH="/usr/local/cuda/lib64:$PKG_CONFIG_PATH"
 export CUDA_PATH="/usr/local/cuda:$CUDA_PATH"

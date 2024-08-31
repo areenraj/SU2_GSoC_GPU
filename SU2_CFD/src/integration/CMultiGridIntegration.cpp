@@ -28,6 +28,8 @@
 #include "../../include/integration/CMultiGridIntegration.hpp"
 #include "../../../Common/include/parallelization/omp_structure.hpp"
 
+#include "../../../subprojects/tracy/public/tracy/Tracy.hpp"
+
 
 CMultiGridIntegration::CMultiGridIntegration() : CIntegration() { }
 
@@ -38,6 +40,8 @@ void CMultiGridIntegration::MultiGrid_Iteration(CGeometry ****geometry,
                                                 unsigned short RunTime_EqSystem,
                                                 unsigned short iZone,
                                                 unsigned short iInst) {
+
+                                                  ZoneScoped;
 
   bool direct;
   switch (config[iZone]->GetKind_Solver()) {
